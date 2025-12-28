@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Master Bot Control Panel{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🤖 Master Bot</h2>
+            <p>Control Panel v1.0</p>
+        </div>
+        
+        <nav>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/admin/dashboard" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/bots">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Manage Bots
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/bots/add">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add New Bot
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/logs">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Activity Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/logout">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1>Dashboard</h1>
+            <div>
+                <span style="color: var(--text-secondary);">Welcome, {{ user.username }}</span>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_bots }}</div>
+                <div class="stat-label">Total Bots</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">{{ active_bots }}</div>
+                <div class="stat-label">Active Bots</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value">{{ error_bots }}</div>
+                <div class="stat-label">Errors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+        </div>
+        
+        <!-- Bots Grid -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Managed Bots</h2>
+                <a href="/admin/bots/add" class="btn btn-primary btn-sm">
+                    + Add Bot
+                </a>
+            </div>
+            
+            {% if bots %}
+            <div class="bots-grid">
+                {% for bot in bots %}
+                <div class="bot-card">
+                    <div class="bot-card-header">
+                        <div>
+                            <h3>{{ bot.name }}</h3>
+                            <p>{{ bot.description or 'No description' }}</p>
+                        </div>
+                        <span class="status-badge status-{{ bot.status }}">
+                            {{ bot.status }}
+                        </span>
+                    </div>
+                    
+                    <div style="margin-bottom: 10px;">
+                        <small style="color: var(--text-secondary);">Token:</small>
+                        <code style="background: var(--dark-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">
+                            {{ bot.token_masked }}
+                        </code>
+                    </div>
+                    
+                    <div class="bot-card-actions">
+                        {% if bot.is_active %}
+                        <a href="/admin/bots/{{ bot.id }}/stop" class="btn btn-danger btn-sm">
+                            Stop
+                        </a>
+                        <a href="/admin/bots/{{ bot.id }}/restart" class="btn btn-warning btn-sm">
+                            Restart
+                        </a>
+                        {% else %}
+                        <a href="/admin/bots/{{ bot.id }}/start" class="btn btn-success btn-sm">
+                            Start
+                        </a>
+                        {% endif %}
+                        <a href="/admin/bots/{{ bot.id }}/edit" class="btn btn-secondary btn-sm">
+                            Edit
+                        </a>
+                        <a href="/admin/bots/{{ bot.id }}/delete" class="btn btn-danger btn-sm" 
+                           onclick="return confirm('Are you sure you want to delete this bot?')">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                <h3>No Bots Yet</h3>
+                <p>Add your first Telegram bot to get started</p>
+                <a href="/admin/bots/add" class="btn btn-primary" style="margin-top: 20px;">
+                    + Add Your First Bot
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Activity</h2>
+                <a href="/admin/logs" class="btn btn-secondary btn-sm">View All</a>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_logs %}
+                        <tr>
+                            <td>{{ log.created_at[:19] }}</td>
+                            <td>{{ log.username }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

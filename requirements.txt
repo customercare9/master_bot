@@ -1,0 +1,17 @@
+# Master Bot Control Panel - Requirements
+# FastAPI-based system to manage multiple Telegram bots
+
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+sqlalchemy>=2.0.0
+pydantic>=2.0.0
+jinja2>=3.1.0
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+aiogram>=3.0.0
+python-dotenv>=1.0.0
+
+# For development
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
